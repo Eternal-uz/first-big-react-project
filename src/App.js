@@ -1,23 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import PostFilter from "./components/PostFilter";
+import PostForm from "./components/PostForm";
+import PostList from "./components/PostList";
+import MyButton from "./components/UI/Button/MyButton";
+import MyModal from "./components/UI/Modal/MyModal";
+import { usePosts } from "./hooks/usePosts";
+
+import "./styles/App.css";
 
 function App() {
+  const [posts, setPosts] = useState([
+    { id: 1, title: "Javascript", body: "description" },
+    { id: 2, title: "Python", body: "description" },
+    { id: 3, title: "PHP", body: "description" },
+  ]);
+  const [filter, setFilter] = useState({ query: "", sort: "" });
+  const [modal, setModal] = useState(false);
+  
+  const sortedAndSearchedPosts = usePosts(posts, filter.query, filter.sort)
+
+  const createPost = (newPost) => {
+    setPosts([...posts, newPost]);
+    setModal(false)
+  };
+
+  const removePost = (post) => {
+    setPosts(posts.filter((p) => p.id !== post.id));
+  };
+
+
+
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <MyButton style={{marginTop: '20px'}} onClick={(e) => setModal(true)}>Create a Post</MyButton>
+      <MyModal visible={modal} setVisible={setModal}>
+        <PostForm create={createPost} />
+      </MyModal>
+
+      <hr style={{ margin: "15px 0" }} />
+      <PostFilter filter={filter} setFilter={setFilter} />
+
+      <PostList
+        remove={removePost}
+        posts={sortedAndSearchedPosts}
+        title="List of Posts"
+      />
     </div>
   );
 }
